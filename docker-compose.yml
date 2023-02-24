@@ -1,0 +1,43 @@
+version: "3"
+services:
+  php:
+    build: php
+    ports:
+      - 8000:80
+      - 8443:443
+    volumes:
+      - ./drupal:/app/drupal
+      - ./php/drupal.conf:/etc/apache2/sites-enabled/drupal.conf
+      - ./apache/server.pem:/etc/ssl/certs/server.pem
+      - ./apache/server.key:/etc/ssl/private/server.key
+  web:
+    build: apache
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./apache/prestashop.conf:/etc/apache2/sites-enabled/prestashop.conf
+      - ./apache/wordpress.conf:/etc/apache2/sites-enabled/wordpress.conf
+      - ./prestashop:/app/prestashop
+      - ./wordpress:/app/wordpress
+      - ./apache/server.pem:/etc/ssl/certs/server.pem
+      - ./apache/server.key:/etc/ssl/private/server.key
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: abc123.
+      MYSQL_DATABASE: presta
+      MYSQL_USER: prestauser
+      MYSQL_PASSWORD: prestapw
+    volumes:
+      - basedatos:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+volumes:
+  basedatos:
